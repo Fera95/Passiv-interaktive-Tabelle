@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Passiv – interaktive Tabelle</title>
+<style>
+:root{--bg:#f6f7f4;--surf:#fff;--ink:#1f2a24;--mute:#5b6b62;--line:#d8e0da;--acc:#1f7a5a;--accbg:#e3f3ec;--ok:#1a7f4b;--okbg:#e3f5ea;--bad:#b3261e;--badbg:#fbe7e5;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121915;--surf:#1a231e;--ink:#e6efe9;--mute:#9db0a5;--line:#2c3a32;--acc:#6fd0a8;--accbg:#1d3a2e;--ok:#5fd394;--okbg:#17342a;--bad:#f19990;--badbg:#3b1f1d}}
+:root[data-theme="dark"]{--bg:#121915;--surf:#1a231e;--ink:#e6efe9;--mute:#9db0a5;--line:#2c3a32;--acc:#6fd0a8;--accbg:#1d3a2e;--ok:#5fd394;--okbg:#17342a;--bad:#f19990;--badbg:#3b1f1d}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Georgia,"Times New Roman",serif}
+main{max-width:860px;margin:0 auto;padding:28px 18px 60px}
+h1{font-size:2rem;margin:0 0 4px;letter-spacing:-.01em}
+h2{font-size:1.25rem;margin:36px 0 10px}
+.sub{color:var(--mute);margin:0 0 22px;font-family:system-ui,sans-serif;font-size:.95rem}
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--surf)}
+table{border-collapse:collapse;width:100%;font-family:system-ui,sans-serif;font-size:.95rem}
+th,td{padding:12px 14px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--accbg);font-weight:600}
+tr:last-child td{border-bottom:0}
+tr.row{cursor:pointer}
+tr.row:hover td,tr.row:focus td{background:var(--accbg)}
+tr.row:focus{outline:2px solid var(--acc);outline-offset:-2px}
+.ex{display:none;color:var(--mute);margin-top:6px}
+tr.open .ex{display:block}
+tr.open td:first-child{border-left:4px solid var(--acc)}
+.hint{font-size:.85rem;color:var(--mute);font-family:system-ui,sans-serif;margin:8px 0 0}
+.de{font-family:Georgia,serif;font-style:italic}
+button{font:inherit;font-family:system-ui,sans-serif;cursor:pointer}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.tab,.opt,.reset{padding:8px 14px;border:1px solid var(--line);background:var(--surf);color:var(--ink);border-radius:999px;font-size:.9rem}
+.opt{border-radius:8px}
+.tab[aria-selected="true"]{background:var(--acc);color:#fff;border-color:var(--acc)}
+.tab:focus-visible,.opt:focus-visible,.reset:focus-visible,.step:focus-visible{outline:2px solid var(--acc);outline-offset:2px}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;font-family:system-ui,sans-serif}
+@media (max-width:560px){.cmp{grid-template-columns:1fr}}
+.cmp div{padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surf)}
+.cmp small{display:block;color:var(--mute);margin-bottom:4px}
+.cmp .p{background:var(--accbg);border-color:var(--acc)}
+.cmp .de{font-size:1.05rem}
+.steps{display:grid;gap:8px;font-family:system-ui,sans-serif}
+.step{text-align:left;padding:12px 14px;border:1px solid var(--line);background:var(--surf);color:var(--ink);border-radius:10px;width:100%}
+.step span{display:none;margin-top:6px;color:var(--mute)}
+.step.open{background:var(--accbg);border-color:var(--acc)}
+.step.open span{display:block}
+.q{background:var(--surf);border:1px solid var(--line);border-radius:10px;padding:14px;margin-bottom:12px;font-family:system-ui,sans-serif}
+.q p{margin:0 0 10px}
+.opts{display:flex;gap:8px;flex-wrap:wrap}
+.opt.ok{background:var(--okbg);border-color:var(--ok);color:var(--ok)}
+.opt.bad{background:var(--badbg);border-color:var(--bad);color:var(--bad)}
+.fb{margin:10px 0 0;font-size:.9rem;color:var(--mute);min-height:1.2em}
+.score{font-family:system-ui,sans-serif;font-weight:600;margin:6px 0 10px}
+</style>
+</head>
+<body>
+<main>
+<h1>Passiv</h1>
+<p class="sub">Vorgangspassiv und Zustandspassiv – klicke auf eine Zeile, um ein Beispiel zu sehen.</p>
+
+<div class="tw"><table>
+<thead><tr><th>Thema</th><th>Erklärung</th></tr></thead>
+<tbody id="main"></tbody>
+</table></div>
+<p class="hint">Tipp: Mit Tab und Enter kannst du die Zeilen auch per Tastatur öffnen.</p>
+
+<h2>Vorgangspassiv und Zustandspassiv im Vergleich</h2>
+<div class="tw"><table>
+<thead><tr><th></th><th>Vorgangspassiv</th><th>Zustandspassiv</th></tr></thead>
+<tbody>
+<tr><td>Bildung</td><td><b>werden</b> + Partizip II</td><td><b>sein</b> + Partizip II</td></tr>
+<tr><td>Bedeutung</td><td>Handlung, Vorgang</td><td>Ergebnis, Zustand</td></tr>
+<tr><td>Beispiel</td><td class="de">Die Tür wird geschlossen.</td><td class="de">Die Tür ist geschlossen.</td></tr>
+</tbody></table></div>
+
+<h2>Bildung in allen Zeiten</h2>
+<div class="tw"><table>
+<thead><tr><th>Zeit</th><th>Formel</th><th>Beispiel</th></tr></thead>
+<tbody>
+<tr><td>Präsens</td><td>werden + Partizip II</td><td class="de">wird gemacht</td></tr>
+<tr><td>Präteritum</td><td>wurde + Partizip II</td><td class="de">wurde gemacht</td></tr>
+<tr><td>Perfekt</td><td>sein + Partizip II + worden</td><td class="de">ist gemacht worden</td></tr>
+<tr><td>Plusquamperfekt</td><td>war + Partizip II + worden</td><td class="de">war gemacht worden</td></tr>
+<tr><td>Futur I</td><td>wird + Partizip II + werden</td><td class="de">wird gemacht werden</td></tr>
+<tr><td>Konjunktiv II</td><td>würde + Partizip II + werden</td><td class="de">würde gemacht werden</td></tr>
+<tr><td>Modalverb Präsens</td><td>Modalverb + Partizip II + werden</td><td class="de">muss gemacht werden</td></tr>
+<tr><td>Modalverb Präteritum</td><td>musste + Partizip II + werden</td><td class="de">musste gemacht werden</td></tr>
+<tr><td>Zustandspassiv</td><td>sein + Partizip II</td><td class="de">ist gemacht</td></tr>
+</tbody></table></div>
+
+<h2>Konjugation von werden</h2>
+<div class="tw"><table>
+<thead><tr><th></th><th>Präsens</th><th>Präteritum</th><th>Partizip II (Passiv)</th></tr></thead>
+<tbody>
+<tr><td>ich</td><td>werde</td><td>wurde</td><td rowspan="6" class="de">worden<br>(nicht geworden)</td></tr>
+<tr><td>du</td><td>wirst</td><td>wurdest</td></tr>
+<tr><td>er/sie/es</td><td>wird</td><td>wurde</td></tr>
+<tr><td>wir</td><td>werden</td><td>wurden</td></tr>
+<tr><td>ihr</td><td>werdet</td><td>wurdet</td></tr>
+<tr><td>sie/Sie</td><td>werden</td><td>wurden</td></tr>
+</tbody></table></div>
+
+<h2>Passiv in allen Zeiten</h2>
+<div class="tabs" role="tablist" id="tabs"></div>
+<div class="cmp" id="cmp"></div>
+
+<h2>Aktiv in Passiv umwandeln</h2>
+<div class="steps" id="steps"></div>
+
+<h2>Schreibübung: Aktiv → Passiv</h2>
+<p class="hint" style="margin:0 0 10px">Schreibe den Satz im Passiv (Zeit beibehalten). Die Angabe mit von ist optional.</p>
+<div id="wr"></div>
+
+<h2>Multiple-Choice-Übung (20 Fragen)</h2>
+<div class="score" id="score">Punkte: 0 / 0</div>
+<div id="quiz"></div>
+<button class="reset" id="reset" type="button">Neu starten</button>
+</main>
+
+<script>
+var rows=[
+["Bildung","Form von werden + Partizip II","Der Salat wird gemacht."],
+["Bedeutung","Der Fokus liegt auf der Handlung, nicht auf dem Täter","Hier wird Deutsch gesprochen."],
+["Akkusativobjekt","Das Akkusativobjekt des Aktivsatzes wird zum Subjekt","Der Koch macht den Salat. → Der Salat wird (vom Koch) gemacht."],
+["Täter mit von","Handelnde Person oder Ursache: von + Dativ","Der Brief wurde von meiner Mutter geschrieben."],
+["Täter mit durch","Mittel oder Vermittler: durch + Akkusativ","Die Stadt wurde durch ein Erdbeben zerstört."],
+["Perfekt","Partizip II + worden (nicht geworden!)","Das Haus ist gebaut worden."],
+["Modalverben","Modalverb + Partizip II + werden","Die Hausaufgaben müssen gemacht werden."],
+["Subjektloses Passiv","Ohne Akkusativobjekt gibt es kein neues Subjekt; es steht kein Subjekt oder es","Heute wird getanzt. / Es wird getanzt."],
+["Ersatzformen","man + Aktiv, sich lassen + Infinitiv, sein + zu + Infinitiv","Das Problem ist zu lösen. = Das Problem kann gelöst werden."],
+["Dativobjekt","Der Dativ bleibt im Passiv; es entsteht kein neues Subjekt","Man hilft dem Kind. → Dem Kind wird geholfen."],
+["Präpositionalobjekt","Die Präposition bleibt erhalten","Man wartet auf ihn. → Auf ihn wird gewartet."],
+["Zustandspassiv","sein + Partizip II beschreibt das Ergebnis eines Vorgangs","Das Fenster ist geöffnet."],
+["bekommen-Passiv","bekommen oder kriegen + Partizip II (umgangssprachlich, für Dativobjekte)","Ich bekomme ein Buch geschenkt."],
+["Passiv mit lassen","sich lassen + Infinitiv hat Passivbedeutung","Das lässt sich leicht machen."],
+["Verben ohne Passiv","Kein Passiv bei haben (Besitz), bekommen, kennen, wissen, kosten, wiegen","Falsch: Ein Auto wird gehabt."],
+["Wann Passiv?","Wenn der Täter unbekannt, unwichtig oder selbstverständlich ist; typisch in Nachrichten und Anleitungen","Das Auto wurde gestohlen."],
+["Wann lieber Aktiv?","Wenn der Täter bekannt und wichtig ist","Besser: Maria hat das Auto gekauft."],
+["Typischer Fehler","Im Perfekt nicht „geworden“ verwenden","Falsch: ist gemacht geworden. Richtig: ist gemacht worden."]
+];
+var tb=document.getElementById('main');
+rows.forEach(function(r){
+ var tr=document.createElement('tr');tr.className='row';tr.tabIndex=0;
+ var td1=document.createElement('td');var b=document.createElement('b');b.textContent=r[0];td1.appendChild(b);
+ var td2=document.createElement('td');td2.textContent=r[1];
+ var ex=document.createElement('div');ex.className='ex de';ex.textContent=r[2];td2.appendChild(ex);
+ tr.appendChild(td1);tr.appendChild(td2);
+ function t(){tr.classList.toggle('open')}
+ tr.addEventListener('click',t);
+ tr.addEventListener('keydown',function(e){if(e.key==='Enter'||e.key===' '){e.preventDefault();t()}});
+ tb.appendChild(tr);
+});
+
+var tenses=[
+["Präsens","Der Koch macht den Salat.","Der Salat wird gemacht."],
+["Präteritum","Der Koch machte den Salat.","Der Salat wurde gemacht."],
+["Perfekt","Der Koch hat den Salat gemacht.","Der Salat ist gemacht worden."],
+["Plusquamperfekt","Der Koch hatte den Salat gemacht.","Der Salat war gemacht worden."],
+["Futur I","Der Koch wird den Salat machen.","Der Salat wird gemacht werden."],
+["Modalverb","Der Koch muss den Salat machen.","Der Salat muss gemacht werden."],
+["Konjunktiv II","Der Koch würde den Salat machen.","Der Salat würde gemacht werden."],
+["Modal Präteritum","Der Koch musste den Salat machen.","Der Salat musste gemacht werden."],
+["Dativobjekt","Man hilft dem Kind.","Dem Kind wird geholfen."],
+["Ohne Subjekt","Man tanzt heute Abend.","Heute Abend wird getanzt."],
+["Zustandspassiv","Der Koch hat den Salat gemacht.","Der Salat ist gemacht."]
+];
+var tabs=document.getElementById('tabs'),cmp=document.getElementById('cmp');
+function showT(i){
+ Array.prototype.forEach.call(tabs.children,function(b,j){b.setAttribute('aria-selected',j===i)});
+ cmp.innerHTML='';
+ [["Aktiv",tenses[i][1],""],["Passiv",tenses[i][2],"p"]].forEach(function(x){
+  var d=document.createElement('div');if(x[2])d.className=x[2];
+  var s=document.createElement('small');s.textContent=x[0];
+  var t=document.createElement('div');t.className='de';t.style.border='0';t.style.padding='0';t.style.background='none';t.textContent=x[1];
+  d.appendChild(s);d.appendChild(t);cmp.appendChild(d);
+ });
+}
+tenses.forEach(function(t,i){
+ var b=document.createElement('button');b.type='button';b.className='tab';b.setAttribute('role','tab');b.textContent=t[0];
+ b.addEventListener('click',function(){showT(i)});tabs.appendChild(b);
+});
+showT(0);
+
+var steps=[
+["Schritt 1: Ausgangssatz","Der Lehrer erklärt die Regel.","Subjekt: der Lehrer. Akkusativobjekt: die Regel."],
+["Schritt 2: Neues Subjekt","Die Regel …","Das Akkusativobjekt wird zum Subjekt (Nominativ)."],
+["Schritt 3: Verb","… wird erklärt","werden in der gleichen Zeit und Person + Partizip II."],
+["Schritt 4: Täter (optional)","… vom Lehrer.","Das alte Subjekt steht mit von + Dativ oder entfällt."]
+];
+var sd=document.getElementById('steps');
+steps.forEach(function(s){
+ var b=document.createElement('button');b.type='button';b.className='step';
+ var t=document.createElement('b');t.textContent=s[0];
+ var x=document.createElement('div');x.className='de';x.textContent=s[1];x.style.marginTop='4px';
+ var sp=document.createElement('span');sp.textContent=s[2];
+ b.appendChild(t);b.appendChild(x);b.appendChild(sp);
+ b.addEventListener('click',function(){b.classList.toggle('open')});
+ sd.appendChild(b);
+});
+
+var wi=[
+["Der Arzt untersucht den Patienten.",["der patient wird untersucht","der patient wird vom arzt untersucht"],"Der Patient wird (vom Arzt) untersucht."],
+["Die Kinder haben den Kuchen gegessen.",["der kuchen ist gegessen worden","der kuchen ist von den kindern gegessen worden"],"Der Kuchen ist (von den Kindern) gegessen worden."],
+["Man baut hier ein neues Haus.",["hier wird ein neues haus gebaut","ein neues haus wird hier gebaut"],"Hier wird ein neues Haus gebaut."],
+["Man muss die Rechnung bezahlen.",["die rechnung muss bezahlt werden"],"Die Rechnung muss bezahlt werden."],
+["Der Mechaniker reparierte das Auto.",["das auto wurde repariert","das auto wurde vom mechaniker repariert"],"Das Auto wurde (vom Mechaniker) repariert."],
+["Man hilft dem Kind.",["dem kind wird geholfen","es wird dem kind geholfen"],"Dem Kind wird geholfen."],
+["Der Lehrer wird die Prüfung korrigieren.",["die pruefung wird korrigiert werden","die pruefung wird vom lehrer korrigiert werden"],"Die Prüfung wird (vom Lehrer) korrigiert werden."],
+["Man tanzt heute Abend.",["heute abend wird getanzt","es wird heute abend getanzt"],"Heute Abend wird getanzt."]
+];
+function nz(s){return s.toLowerCase().replace(/ä/g,'ae').replace(/ö/g,'oe').replace(/ü/g,'ue').replace(/ß/g,'ss').replace(/[.!?]/g,'').replace(/\s+/g,' ').trim()}
+var wr=document.getElementById('wr');
+wi.forEach(function(w){
+ var box=document.createElement('div');box.className='q';
+ var p=document.createElement('p');p.className='de';p.textContent=w[0];box.appendChild(p);
+ var row=document.createElement('div');row.className='opts';
+ var inp=document.createElement('input');inp.type='text';inp.setAttribute('aria-label','Passivsatz');inp.autocomplete='off';
+ inp.style.cssText='flex:1;min-width:200px;padding:9px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surf);color:var(--ink);font:inherit';
+ var bt=document.createElement('button');bt.type='button';bt.className='opt';bt.textContent='Prüfen';
+ var fb=document.createElement('div');fb.className='fb';fb.setAttribute('aria-live','polite');
+ function chk(){var ok=w[1].indexOf(nz(inp.value))>-1;inp.style.borderColor=ok?'var(--ok)':'var(--bad)';fb.textContent=ok?'Richtig!':'Noch nicht. Lösung: '+w[2]}
+ bt.addEventListener('click',chk);
+ inp.addEventListener('keydown',function(e){if(e.key==='Enter')chk()});
+ row.appendChild(inp);row.appendChild(bt);box.appendChild(row);box.appendChild(fb);wr.appendChild(box);
+});
+
+var qs=[
+["Welcher Satz ist Passiv?",["Er liest das Buch.","Das Buch wird gelesen.","Er hat das Buch gelesen."],1,"werden + Partizip II."],
+["Ergänze: Das Haus ist 1990 gebaut ___.",["geworden","worden","werden"],1,"Im Perfekt Passiv steht worden."],
+["Welcher Satz ist Zustandspassiv?",["Das Fenster wird geöffnet.","Das Fenster ist geöffnet.","Das Fenster wurde geöffnet."],1,"sein + Partizip II beschreibt den Zustand."],
+["Passiv von „Man muss die Tür schließen.“",["Die Tür muss geschlossen werden.","Die Tür wird schließen müssen.","Die Tür muss geschlossen sein."],0,"Modalverb + Partizip II + werden."],
+["Der Brief wurde ___ meiner Schwester geschrieben.",["durch","von","für"],1,"Handelnde Person: von + Dativ."],
+["Passiv Präteritum: Das Auto ___ repariert.",["wird","wurde","ist"],1,"Präteritum von werden: wurde."],
+["Futur I Passiv: Der Test wird morgen geschrieben ___.",["werden","worden","sein"],0,"Futur I: wird + Partizip II + werden."],
+["Plusquamperfekt Passiv: Die Tür ___ geschlossen worden.",["ist","war","wurde"],1,"war + Partizip II + worden."],
+["Welcher Satz ist richtig?",["Dem Kind wird geholfen.","Das Kind wird geholfen.","Dem Kind geholfen wird worden."],0,"helfen verlangt Dativ, und der Dativ bleibt im Passiv."],
+["Welches Verb bildet in diesem Sinn kein Passiv?",["bauen","haben (Besitz)","lesen"],1,"haben im Sinn von Besitz bildet kein Passiv."],
+["„Das Problem ist zu lösen.“ bedeutet:",["Das Problem kann gelöst werden.","Das Problem hat gelöst.","Das Problem wird zu lösen."],0,"sein + zu + Infinitiv ersetzt ein Passiv mit können oder müssen."],
+["Die Stadt wurde ___ ein Erdbeben zerstört.",["von","durch","mit"],1,"Ursache oder Mittel: durch + Akkusativ."],
+["___ wird heute getanzt.",["Es","Man","Er"],0,"Es als Platzhalter (oder gar kein Subjekt)."],
+["Perfekt Passiv von „Man hat das Fenster geöffnet.“",["Das Fenster ist geöffnet worden.","Das Fenster ist geöffnet geworden.","Das Fenster hat geöffnet worden."],0,"sein + Partizip II + worden."],
+["Es ist 22 Uhr. Das Geschäft ___ schon geschlossen.",["wird","ist","wurde"],1,"Zustand: sein + Partizip II."],
+["Modalverb im Präteritum: Das Zimmer ___ gereinigt werden.",["musste","muss","musst"],0,"musste + Partizip II + werden."],
+["Konjunktiv II: Das Haus ___ gebaut werden, wenn wir Geld hätten.",["würde","wurde","wird"],0,"würde + Partizip II + werden."],
+["Welcher Satz ist Aktiv?",["Der Brief wurde geschrieben.","Der Brief ist geschrieben.","Er schreibt den Brief."],2,"Das Subjekt handelt selbst."],
+["Gestern ___ der Dieb von der Polizei gefasst.",["wurde","wird","ist"],0,"Vergangenheit, Vorgang: wurde."],
+["„Das lässt sich leicht machen.“ entspricht:",["Das kann leicht gemacht werden.","Das wird leicht machen.","Das hat leicht gemacht."],0,"sich lassen + Infinitiv ersetzt ein Passiv mit können."]
+];
+var qd=document.getElementById('quiz'),sc=document.getElementById('score'),pts=0,done=0;
+function build(){
+ qd.innerHTML='';pts=0;done=0;sc.textContent='Punkte: 0 / 0';
+ qs.forEach(function(q){
+  var box=document.createElement('div');box.className='q';
+  var p=document.createElement('p');p.textContent=q[0];box.appendChild(p);
+  var o=document.createElement('div');o.className='opts';box.appendChild(o);
+  var fb=document.createElement('div');fb.className='fb';fb.setAttribute('aria-live','polite');box.appendChild(fb);
+  var answered=false;
+  q[1].forEach(function(t,i){
+   var b=document.createElement('button');b.type='button';b.className='opt';b.textContent=t;
+   b.addEventListener('click',function(){
+    if(answered)return;answered=true;done++;
+    var ok=i===q[2];if(ok)pts++;
+    b.classList.add(ok?'ok':'bad');
+    if(!ok)o.children[q[2]].classList.add('ok');
+    fb.textContent=(ok?'Richtig! ':'Leider falsch. ')+q[3];
+    sc.textContent='Punkte: '+pts+' / '+done;
+   });
+   o.appendChild(b);
+  });
+  qd.appendChild(box);
+ });
+}
+document.getElementById('reset').addEventListener('click',build);
+build();
+</script>
+</body>
+</html>
